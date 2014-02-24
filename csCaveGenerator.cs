@@ -141,6 +141,31 @@ namespace maze
             return Caves.Count();
         }
 
+        /// <summary>
+        /// Generate a bitmap from the contents of the map array
+        /// </summary>
+        /// <returns></returns>
+        public Bitmap GetMapImage()
+        {
+            //adjust to change the pixel size on the image
+            Size blocksize = new Size(5, 5);
+
+            Bitmap bmp = new Bitmap(MapSize.Width * blocksize.Width, MapSize.Height * blocksize.Height);
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                using (SolidBrush sbBlack = new SolidBrush(Color.Black))
+                {
+                    for (int x = 0; x < MapSize.Width; x++)
+                        for (int y = 0; y < MapSize.Height; y++)
+                            if (Map[x, y] == 1)
+                                g.FillRectangle(sbBlack, new Rectangle(x * blocksize.Width, y * blocksize.Height, blocksize.Width, blocksize.Height));
+
+                }
+            }
+
+            return bmp;
+        }
+
 #endregion
 
 
