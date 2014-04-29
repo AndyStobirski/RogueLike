@@ -172,10 +172,12 @@ namespace map
                                 if (    //if prior closed AND within range
                                         x - 1 >= 0
                                         && map[x - 1, y] == 1)
-                                    pStartSlope = GetSlope(x - 0.5, y - 0.5, player.X, player.Y, false);
+                                        pStartSlope = GetSlope(x - 0.5, y - 0.5, player.X, player.Y, false);
+                                    
+                                    VisiblePoints.Add(new Point(x, y));
 
                             }
-                            VisiblePoints.Add(new Point(x, y));
+                            
                         }
                         x++;
                     }
@@ -209,9 +211,9 @@ namespace map
                                     )
                                     pStartSlope = -GetSlope(x + 0.5, y - 0.5, player.X, player.Y, false);
 
-
+                                VisiblePoints.Add(new Point(x, y));
                             }
-                            VisiblePoints.Add(new Point(x, y));
+                            
                         }
                         x--;
                     }
@@ -246,9 +248,9 @@ namespace map
                                    )
                                     pStartSlope = -GetSlope(x + 0.5, y - 0.5, player.X, player.Y, true);
 
-
+                                VisiblePoints.Add(new Point(x, y));
                             }
-                            VisiblePoints.Add(new Point(x, y));
+                            
 
                         }
                         y++;
@@ -285,8 +287,10 @@ namespace map
                                     pStartSlope = GetSlope(x + 0.5, y + 0.5, player.X, player.Y, true);
 
 
+                                 VisiblePoints.Add(new Point(x, y));
+
                             }
-                            VisiblePoints.Add(new Point(x, y));
+                           
 
                         }
                         y--;
