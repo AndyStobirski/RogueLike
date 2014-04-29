@@ -162,7 +162,6 @@ namespace map
                             {
                                 if (    //if prior cell open AND within range
                                         x - 1 >= 0
-                                        && GetVisDistance(x - 1, y, player.X, player.Y) <= visrange2
                                         && map[x - 1, y] == 0
                                    )
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y + 0.5, player.X, player.Y, false));
@@ -170,9 +169,8 @@ namespace map
                             else
                             {
 
-                                if (    //if prior open AND within range
+                                if (    //if prior closed AND within range
                                         x - 1 >= 0
-                                        && GetVisDistance(x - 1, y, player.X, player.Y) <= visrange2
                                         && map[x - 1, y] == 1)
                                     pStartSlope = GetSlope(x - 0.5, y - 0.5, player.X, player.Y, false);
 
@@ -199,7 +197,6 @@ namespace map
                             if (map[x, y] == 1)
                             {
                                 if (x + 1 < map.GetLength(0)
-                                        && GetVisDistance(x + 1, y, player.X, player.Y) <= visrange2
                                         && map[x + 1, y] == 0
                                     )
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y + 0.5, player.X, player.Y, false));
@@ -208,7 +205,6 @@ namespace map
                             {
                                 if (
                                         x + 1 < map.GetLength(0)
-                                        && GetVisDistance(x + 1, y, player.X, player.Y) <= visrange2
                                         && map[x + 1, y] == 1
                                     )
                                     pStartSlope = -GetSlope(x + 0.5, y - 0.5, player.X, player.Y, false);
@@ -239,7 +235,6 @@ namespace map
                             if (map[x, y] == 1)
                             {
                                 if (y - 1 >= 0
-                                        && GetVisDistance(x, y - 1, player.X, player.Y) <= visrange2
                                         && map[x, y - 1] == 0
                                     )
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y - 0.5, player.X, player.Y, true));
@@ -247,7 +242,6 @@ namespace map
                             else
                             {
                                 if (y - 1 >= 0
-                                       && GetVisDistance(x, y - 1, player.X, player.Y) <= visrange2
                                        && map[x, y - 1] == 1
                                    )
                                     pStartSlope = -GetSlope(x + 0.5, y - 0.5, player.X, player.Y, true);
@@ -280,14 +274,12 @@ namespace map
                             if (map[x, y] == 1)
                             {
                                 if (y + 1 < map.GetLength(1)
-                                        && GetVisDistance(x, y + 1, player.X, player.Y) <= visrange2
                                         && map[x, y + 1] == 0)
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y + 0.5, player.X, player.Y, true));
                             }
                             else
                             {
                                 if (y + 1 < map.GetLength(1)
-                                        && GetVisDistance(x, y + 1, player.X, player.Y) <= visrange2
                                         && map[x, y + 1] == 1
                                     )
                                     pStartSlope = GetSlope(x + 0.5, y + 0.5, player.X, player.Y, true);
@@ -312,13 +304,12 @@ namespace map
 
                     while (GetSlope(x, y, player.X, player.Y, false) >= pEndSlope)
                     {
-                        if (GetVisDistance(x, y, player.X, player.Y) <= VisualRange * VisualRange)
+                        if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
 
                             if (map[x, y] == 1)
                             {
                                 if (x + 1 < map.GetLength(1)
-                                        && GetVisDistance(x+1, y, player.X, player.Y) <= visrange2
                                         && map[x+1, y] == 0)
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y - 0.5, player.X, player.Y, false));
 
@@ -326,7 +317,6 @@ namespace map
                             else
                             {
                                 if (x + 1 < map.GetLength(1)
-                                        && GetVisDistance(x + 1, y, player.X, player.Y) <= visrange2
                                         && map[x + 1, y] == 1)
                                     pStartSlope = GetSlope(x + 0.5, y + 0.5, player.X, player.Y, false);
 
@@ -349,20 +339,18 @@ namespace map
 
                     while (GetSlope(x, y, player.X, player.Y, false) <= pEndSlope)
                     {
-                        if (GetVisDistance(x, y, player.X, player.Y) <= VisualRange * VisualRange)
+                        if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
 
                             if (map[x, y] == 1)
                             {
                                 if (x - 1 >= 0
-                                        && GetVisDistance(x -1, y, player.X, player.Y) <= visrange2
                                         && map[x - 1, y] == 0)
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y - 0.5, player.X, player.Y, false));
                             }
                             else
                             {
                                 if (x - 1 >= 0
-                                        && GetVisDistance(x - 1, y, player.X, player.Y) <= visrange2
                                         && map[x - 1, y] == 1)
                                     pStartSlope = -GetSlope(x - 0.5, y + 0.5, player.X, player.Y, false);
 
@@ -386,20 +374,18 @@ namespace map
                     while (GetSlope(x, y, player.X, player.Y, true) <= pEndSlope)
                     {
 
-                        if (GetVisDistance(x, y, player.X, player.Y) <= VisualRange * VisualRange)
+                        if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
 
                             if (map[x, y] == 1)
                             {
                                 if (y + 1 < map.GetLength(1)
-                                        && GetVisDistance(x , y+1, player.X, player.Y) <= visrange2
                                         && map[x, y+1] == 0)
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y + 0.5, player.X, player.Y, true));
                             }
                             else
                             {
                                 if (y + 1 < map.GetLength(1)
-                                        && GetVisDistance(x, y + 1, player.X, player.Y) <= visrange2
                                         && map[x, y + 1] == 1)
                                     pStartSlope = -GetSlope(x - 0.5, y + 0.5, player.X, player.Y, true);
 
@@ -423,13 +409,12 @@ namespace map
                     while (GetSlope(x, y, player.X, player.Y, true) >= pEndSlope)
                     {
 
-                        if (GetVisDistance(x, y, player.X, player.Y) <= VisualRange * VisualRange)
+                        if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
 
                             if (map[x, y] == 1)
                             {
                                 if (y - 1 >=0
-                                        && GetVisDistance(x, y - 1, player.X, player.Y) <= visrange2
                                         && map[x, y - 1] == 0)
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y - 0.5, player.X, player.Y, true));
 
@@ -437,7 +422,6 @@ namespace map
                             else
                             {
                                 if (y - 1 >= 0
-                                        && GetVisDistance(x, y - 1, player.X, player.Y) <= visrange2
                                         && map[x, y - 1] == 1)
                                     pStartSlope = GetSlope(x - 0.5, y - 0.5, player.X, player.Y, true);
 
