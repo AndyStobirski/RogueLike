@@ -249,7 +249,7 @@ namespace map
                     y = player.Y + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (y >= map.GetLength(1)) y = map.GetLength(1) - 1;
 
-                    while (GetSlope(x, y, player.X, player.Y, false) >= pEndSlope)
+                    while (GetSlope(x, y, player.X, player.Y, true) >= pEndSlope)
                     {
 
                         if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
