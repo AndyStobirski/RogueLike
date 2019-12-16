@@ -288,12 +288,12 @@ namespace map
 
                             if (map[x, y] == 1)
                             {
-                                if (x + 1 < map.GetLength(1) && map[x+1, y] == 0)
+                                if (x + 1 < map.GetLength(0) && map[x+1, y] == 0)
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y - 0.5, player.X, player.Y, false));
                             }
                             else
                             {
-                                if (x + 1 < map.GetLength(1)
+                                if (x + 1 < map.GetLength(0)
                                         && map[x + 1, y] == 1)
                                     pStartSlope = GetSlope(x + 0.5, y + 0.5, player.X, player.Y, false);
 
