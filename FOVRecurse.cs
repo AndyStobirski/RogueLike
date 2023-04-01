@@ -112,10 +112,9 @@ namespace map
         public void GetVisibleCells()
         {
             VisiblePoints = new List<Point>();
-            foreach (int o in VisibleOctants)
+            for (int ctr = 0; ctr < VisibleOctants.Length; ctr++)
             {
-                Debug.WriteLine("Octant: " + o.ToString());
-                ScanOctant(1, o, 1.0, 0.0);
+                ScanOctant(1, VisibleOctants[ctr], 1.0, 0.0);
             }
 
         }
