@@ -10,7 +10,7 @@ namespace RogueLikeMapBuilder
     /// This class demonstrates a simple map builder for a roguelike game. For a detailed
     /// look at using it, go here http://www.evilscience.co.uk/?p=553
     /// </summary>
-    class csMapbuilder
+    internal class csMapbuilder
     {
         public int[,] map;
 
@@ -75,7 +75,7 @@ namespace RogueLikeMapBuilder
         /// <summary>
         /// describes the outcome of the corridor building operation
         /// </summary>
-        enum CorridorItemHit
+        private enum CorridorItemHit
         {
 
             invalid //invalid point generated
@@ -94,7 +94,7 @@ namespace RogueLikeMapBuilder
                 , OK //point OK
         }
 
-        Point[] directions_straight = new Point[]{ 
+        Point[] directions_straight = new Point[]{
                                             new Point(0, -1) //n
                                             , new Point(0, 1)//s
                                             , new Point(1, 0)//w
@@ -104,7 +104,7 @@ namespace RogueLikeMapBuilder
         private int filledcell = 1;
         private int emptycell = 0;
 
-        Random rnd = new Random();
+        Random rnd = new();
 
         public csMapbuilder(int x, int y)
         {
@@ -174,7 +174,7 @@ namespace RogueLikeMapBuilder
                 {
 
                     CorBuildOutcome = CorridorMake_Straight(ref Location, ref Direction, rnd.Next(1, Corridor_MaxTurns)
-                        , rnd.Next(0,100) > 50 ? true : false);
+                        , rnd.Next(0, 100) > 50 ? true : false);
 
                     switch (CorBuildOutcome)
                     {
@@ -288,7 +288,7 @@ namespace RogueLikeMapBuilder
             Point Direction = new Point();
             CorridorItemHit CorBuildOutcome;
 
-           while (!connection)
+            while (!connection)
             {
 
                 Clear();
@@ -300,10 +300,11 @@ namespace RogueLikeMapBuilder
 
                     //room at the top of the map
                     rctCurrentRoom = new Rectangle()
-                            {
-                                Width = rnd.Next(Room_Min.Width, Room_Max.Width)
-                                , Height = rnd.Next(Room_Min.Height, Room_Max.Height)
-                            };
+                    {
+                        Width = rnd.Next(Room_Min.Width, Room_Max.Width)
+                                ,
+                        Height = rnd.Next(Room_Min.Height, Room_Max.Height)
+                    };
                     rctCurrentRoom.X = rnd.Next(0, Map_Size.Width - rctCurrentRoom.Width);
                     rctCurrentRoom.Y = 1;
                     Room_Build();
@@ -342,7 +343,7 @@ namespace RogueLikeMapBuilder
                 if (Corridor_GetStart(out Location, out Direction))
                 {
 
-                    
+
 
                     CorBuildOutcome = CorridorMake_Straight(ref Location, ref Direction, 100, true);
 
@@ -365,11 +366,11 @@ namespace RogueLikeMapBuilder
         private bool Room_AttemptBuildOnCorridor(Point pDirection)
         {
             rctCurrentRoom = new Rectangle()
-                {
-                    Width = rnd.Next(Room_Min.Width, Room_Max.Width)
+            {
+                Width = rnd.Next(Room_Min.Width, Room_Max.Width)
                     ,
-                    Height = rnd.Next(Room_Min.Height, Room_Max.Height)
-                };
+                Height = rnd.Next(Room_Min.Height, Room_Max.Height)
+            };
 
             //startbuilding room from this point
             Point lc = lPotentialCorridor.Last();
@@ -642,7 +643,7 @@ namespace RogueLikeMapBuilder
                 NewDir = directions_straight[rnd.Next(0, directions_straight.GetLength(0))];
             } while (
                         Direction_Reverse(NewDir) == pDir
-                         | Direction_Reverse( NewDir) == pDirExclude
+                         | Direction_Reverse(NewDir) == pDirExclude
                     );
 
 

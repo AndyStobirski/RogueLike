@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 
 
 namespace map
 {
-
     /// <summary>
     /// Implementation of "FOV using recursive shadowcasting - improved" as
     /// described on http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting_-_improved
@@ -23,7 +23,7 @@ namespace map
     public class FOVRecurse
     {
         public Size MapSize { get; set; }
-        public int[,] map { get; private set; }
+        public int[,] map { get; set; }
 
         /// <summary>
         /// Radius of the player's circle of vision
@@ -41,13 +41,12 @@ namespace map
         /// <summary>
         /// The octants which a player can see
         /// </summary>
-        List<int> VisibleOctants = new List<int>() { 1, 2, 3, 4,5,6,7,8 };
+        int[] VisibleOctants = { 1, 2, 3, 4, 5, 6, 7, 8 };
 
-        public FOVRecurse()
+        public FOVRecurse(int[,] pMap)
         {
-            MapSize = new Size(100, 100);
-            map = new int[MapSize.Width, MapSize.Height];
-            VisualRange = 5;
+            map = pMap;
+            VisiblePoints = new List<Point>();
         }
 
 
@@ -92,18 +91,6 @@ namespace map
             return map[_x, _y];
         }
 
-        /// <summary>
-        /// Set the map point to the specified value
-        /// </summary>
-        /// <param name="_x"></param>
-        /// <param name="_y"></param>
-        /// <param name="_val"></param>
-        public void Point_Set(int _x, int _y, int _val)
-        {
-            if (Point_Valid(_x, _y))
-                map[_x, _y] = _val;
-        }
-
         #endregion
 
         #region FOV algorithm
@@ -126,9 +113,21 @@ namespace map
         {
             VisiblePoints = new List<Point>();
             foreach (int o in VisibleOctants)
+            {
+                Debug.WriteLine("Octant: " + o.ToString());
                 ScanOctant(1, o, 1.0, 0.0);
+            }
 
         }
+
+        private void AddVisiblePoint (int pX, int pY)
+        {
+            if (VisiblePoints.Contains(new Point(pX, pY)))
+                return;
+
+            VisiblePoints.Add(new Point(pX, pY));
+        }
+
 
         /// <summary>
         /// Examine the provided octant and calculate the visible cells within it.
@@ -149,8 +148,8 @@ namespace map
 
                 case 1: //nnw
                     y = player.Y - pDepth;
-					if (y < 0) return;
-					
+                    if (y < 0) return;
+
                     x = player.X - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (x < 0) x = 0;
 
@@ -158,21 +157,22 @@ namespace map
                     {
                         if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
+                            AddVisiblePoint(x,y);
+
                             if (map[x, y] == 1) //current cell blocked
                             {
                                 if (x - 1 >= 0 && map[x - 1, y] == 0) //prior cell within range AND open...
-									//...incremenet the depth, adjust the endslope and recurse
+                                                                      //...incremenet the depth, adjust the endslope and recurse
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y + 0.5, player.X, player.Y, false));
                             }
                             else
                             {
 
                                 if (x - 1 >= 0 && map[x - 1, y] == 1) //prior cell within range AND open...
-									//..adjust the startslope
-									pStartSlope = GetSlope(x - 0.5, y - 0.5, player.X, player.Y, false);
-                                    
-                                    VisiblePoints.Add(new Point(x, y));
-                            }                            
+                                                                      //..adjust the startslope
+                                    pStartSlope = GetSlope(x - 0.5, y - 0.5, player.X, player.Y, false);
+
+                            }
                         }
                         x++;
                     }
@@ -182,15 +182,17 @@ namespace map
                 case 2: //nne
 
                     y = player.Y - pDepth;
-					if (y < 0) return;					
-					
+                    if (y < 0) return;
+
                     x = player.X + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (x >= map.GetLength(0)) x = map.GetLength(0) - 1;
-                    
+
                     while (GetSlope(x, y, player.X, player.Y, false) <= pEndSlope)
                     {
                         if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
+                            AddVisiblePoint(x, y);
+
                             if (map[x, y] == 1)
                             {
                                 if (x + 1 < map.GetLength(0) && map[x + 1, y] == 0)
@@ -200,9 +202,7 @@ namespace map
                             {
                                 if (x + 1 < map.GetLength(0) && map[x + 1, y] == 1)
                                     pStartSlope = -GetSlope(x + 0.5, y - 0.5, player.X, player.Y, false);
-
-                                VisiblePoints.Add(new Point(x, y));
-                            }                            
+                            }
                         }
                         x--;
                     }
@@ -212,9 +212,9 @@ namespace map
                 case 3:
 
                     x = player.X + pDepth;
-					if (x >= map.GetLength(0)) return;
-					
-                    y = player.Y - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth))); 
+                    if (x >= map.GetLength(0)) return;
+
+                    y = player.Y - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (y < 0) y = 0;
 
                     while (GetSlope(x, y, player.X, player.Y, true) <= pEndSlope)
@@ -222,6 +222,8 @@ namespace map
 
                         if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
+
+                            AddVisiblePoint(x, y);
 
                             if (map[x, y] == 1)
                             {
@@ -232,9 +234,7 @@ namespace map
                             {
                                 if (y - 1 >= 0 && map[x, y - 1] == 1)
                                     pStartSlope = -GetSlope(x + 0.5, y - 0.5, player.X, player.Y, true);
-
-                                VisiblePoints.Add(new Point(x, y));
-                            }                           
+                            }
                         }
                         y++;
                     }
@@ -244,8 +244,8 @@ namespace map
                 case 4:
 
                     x = player.X + pDepth;
-					if (x >= map.GetLength(0)) return;
-					
+                    if (x >= map.GetLength(0)) return;
+
                     y = player.Y + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (y >= map.GetLength(1)) y = map.GetLength(1) - 1;
 
@@ -254,10 +254,11 @@ namespace map
 
                         if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
+                            AddVisiblePoint(x, y);
 
                             if (map[x, y] == 1)
                             {
-                                if (y + 1 < map.GetLength(1)&& map[x, y + 1] == 0)
+                                if (y + 1 < map.GetLength(1) && map[x, y + 1] == 0)
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y + 0.5, player.X, player.Y, true));
                             }
                             else
@@ -265,8 +266,7 @@ namespace map
                                 if (y + 1 < map.GetLength(1) && map[x, y + 1] == 1)
                                     pStartSlope = GetSlope(x + 0.5, y + 0.5, player.X, player.Y, true);
 
-                                 VisiblePoints.Add(new Point(x, y));
-                            }                          
+                            }
                         }
                         y--;
                     }
@@ -276,19 +276,20 @@ namespace map
                 case 5:
 
                     y = player.Y + pDepth;
-					if (y >= map.GetLength(1)) return;
-					
+                    if (y >= map.GetLength(1)) return;
+
                     x = player.X + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (x >= map.GetLength(0)) x = map.GetLength(0) - 1;
-                    
+
                     while (GetSlope(x, y, player.X, player.Y, false) >= pEndSlope)
                     {
                         if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
+                            AddVisiblePoint(x, y);
 
                             if (map[x, y] == 1)
                             {
-                                if (x + 1 < map.GetLength(1) && map[x+1, y] == 0)
+                                if (x + 1 < map.GetLength(1) && map[x + 1, y] == 0)
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y - 0.5, player.X, player.Y, false));
                             }
                             else
@@ -297,7 +298,6 @@ namespace map
                                         && map[x + 1, y] == 1)
                                     pStartSlope = GetSlope(x + 0.5, y + 0.5, player.X, player.Y, false);
 
-                                VisiblePoints.Add(new Point(x, y));
                             }
                         }
                         x--;
@@ -308,15 +308,16 @@ namespace map
                 case 6:
 
                     y = player.Y + pDepth;
-					if (y >= map.GetLength(1)) return;					
-					
+                    if (y >= map.GetLength(1)) return;
+
                     x = player.X - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (x < 0) x = 0;
-                    
+
                     while (GetSlope(x, y, player.X, player.Y, false) <= pEndSlope)
                     {
                         if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
+                            AddVisiblePoint(x, y);
 
                             if (map[x, y] == 1)
                             {
@@ -329,7 +330,6 @@ namespace map
                                         && map[x - 1, y] == 1)
                                     pStartSlope = -GetSlope(x - 0.5, y + 0.5, player.X, player.Y, false);
 
-                                VisiblePoints.Add(new Point(x, y));
                             }
                         }
                         x++;
@@ -340,9 +340,9 @@ namespace map
                 case 7:
 
                     x = player.X - pDepth;
-					if (x < 0) return;
-					
-                    y = player.Y + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));                    
+                    if (x < 0) return;
+
+                    y = player.Y + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (y >= map.GetLength(1)) y = map.GetLength(1) - 1;
 
                     while (GetSlope(x, y, player.X, player.Y, true) <= pEndSlope)
@@ -351,17 +351,17 @@ namespace map
                         if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
 
+                            AddVisiblePoint(x, y);
+
                             if (map[x, y] == 1)
                             {
-                                if (y + 1 < map.GetLength(1) && map[x, y+1] == 0)
+                                if (y + 1 < map.GetLength(1) && map[x, y + 1] == 0)
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y + 0.5, player.X, player.Y, true));
                             }
                             else
                             {
                                 if (y + 1 < map.GetLength(1) && map[x, y + 1] == 1)
                                     pStartSlope = -GetSlope(x - 0.5, y + 0.5, player.X, player.Y, true);
-
-                                VisiblePoints.Add(new Point(x, y));
                             }
                         }
                         y--;
@@ -372,8 +372,8 @@ namespace map
                 case 8: //wnw
 
                     x = player.X - pDepth;
-					if (x < 0) return;
-					
+                    if (x < 0) return;
+
                     y = player.Y - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (y < 0) y = 0;
 
@@ -383,9 +383,11 @@ namespace map
                         if (GetVisDistance(x, y, player.X, player.Y) <= visrange2)
                         {
 
+                            AddVisiblePoint(x, y);
+
                             if (map[x, y] == 1)
                             {
-                                if (y - 1 >=0 && map[x, y - 1] == 0)
+                                if (y - 1 >= 0 && map[x, y - 1] == 0)
                                     ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y - 0.5, player.X, player.Y, true));
 
                             }
@@ -393,8 +395,6 @@ namespace map
                             {
                                 if (y - 1 >= 0 && map[x, y - 1] == 1)
                                     pStartSlope = GetSlope(x - 0.5, y - 0.5, player.X, player.Y, true);
-
-                                VisiblePoints.Add(new Point(x, y));
                             }
                         }
                         y++;
@@ -430,10 +430,7 @@ namespace map
         /// <returns></returns>
         private double GetSlope(double pX1, double pY1, double pX2, double pY2, bool pInvert)
         {
-            if (pInvert)
-                return (pY1 - pY2) / (pX1 - pX2);
-            else
-                return (pX1 - pX2) / (pY1 - pY2);
+            return pInvert ? (pY1 - pY2) / (pX1 - pX2) : (pX1 - pX2) / (pY1 - pY2);
         }
 
 
@@ -447,7 +444,7 @@ namespace map
         /// <returns>Distance</returns>
         private int GetVisDistance(int pX1, int pY1, int pX2, int pY2)
         {
-            return ((pX1 - pX2) * (pX1 - pX2)) + ((pY1 - pY2) * (pY1 - pY2));
+            return (pX1 - pX2) * (pX1 - pX2) + (pY1 - pY2) * (pY1 - pY2);
         }
 
         #endregion

@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.ComponentModel;
 
 
 namespace maze
 {
-
     /// <summary>
     /// csCaveGenerator - generate a cave system and connect the caves together.
     /// 
     /// For more info on it's use see http://www.evilscience.co.uk/?p=624
     /// </summary>
-    class csCaveGenerator
+    internal class csCaveGenerator
     {
 
         private Random rnd;
@@ -28,7 +27,7 @@ namespace maze
         public int Iterations { get; set; }
         [Category("Cave Generation"), Description("The size of the map"), DisplayName("Map Size")]
         public Size MapSize { get; set; }
-        
+
 
 
         [Category("Cave Cleaning"), Description("Remove rooms smaller than this value"), DisplayName("Lower Limit")]
@@ -105,6 +104,7 @@ namespace maze
         };
 
         #endregion
+
         #region misc
 
         /// <summary>
@@ -166,8 +166,7 @@ namespace maze
             return bmp;
         }
 
-#endregion
-
+        #endregion
 
         #region cave related
 
@@ -380,15 +379,15 @@ namespace maze
                     //corridors are presnt, so randomly chose whether a get a start
                     //point from a corridor or cave
                     if (rnd.Next(0, 100) > 50)
-                    {
-                        currentcave = ConnectedCaves[rnd.Next(0, ConnectedCaves.Count())];
-                        Cave_GetEdge(currentcave, ref cor_point, ref cor_direction);
-                    }
-                    else
-                    {
-                        currentcave = null;
-                        Corridor_GetEdge(ref cor_point, ref cor_direction);
-                    }
+                {
+                    currentcave = ConnectedCaves[rnd.Next(0, ConnectedCaves.Count())];
+                    Cave_GetEdge(currentcave, ref cor_point, ref cor_direction);
+                }
+                else
+                {
+                    currentcave = null;
+                    Corridor_GetEdge(ref cor_point, ref cor_direction);
+                }
 
 
 
